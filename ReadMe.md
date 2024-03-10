@@ -1,4 +1,4 @@
-# Peer's AI Hut
+# Peer's AI Zoo
 > This Directory is my personal note-taking/implementation space for AI papers I read and for trying out new ideas and linking them to different Papers
 > **NOTE:** To properly view this one should use Obsidian
 ## Papers
