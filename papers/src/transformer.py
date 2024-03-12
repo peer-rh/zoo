@@ -26,7 +26,9 @@ class AttentionBlock(eqx.Module):
             use_value_bias=qkv_bias,
             key=attn_key,
         )
-        self.mlp = nn.MLP(embd_dim, embd_dim, mlp_dim, 1, act=activation, key=mlp_key)
+        self.mlp = nn.MLP(
+            embd_dim, embd_dim, mlp_dim, 1, activation=activation, key=mlp_key
+        )
         self.activation = activation
         self.norm1 = nn.LayerNorm(embd_dim)
         self.norm2 = nn.LayerNorm(embd_dim)

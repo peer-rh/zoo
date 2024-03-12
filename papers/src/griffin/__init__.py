@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import jax.random as jrng
 from equinox import nn
 
-# TODO: Add RoPE
+from ..rope import apply_rope
 
 
 @dataclass
@@ -98,6 +98,9 @@ class LocalMQA(eqx.Module):
         q = jnp.reshape(
             q_s, (sq_len, self.config.mqa_n_queries, self.config.mqa_query_dim)
         )
+        theta = 1 / (10000 ** (jnp.arange(0, k.shape[-1], 2) / k.shape[-1]))
+        q = jax.vmap(apply_rope)(q, theta)
+        k = apply_rope(k, theta)
         mask = jnp.tril(jnp.ones((sq_len, sq_len))) - jnp.tril(
             jnp.ones((sq_len, sq_len)), -self.config.mqa_window
         )
