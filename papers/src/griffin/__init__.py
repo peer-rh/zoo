@@ -17,7 +17,7 @@ class GriffinConfig:
     expansion_factor: int = 4
     d_rnn: int = 1024
 
-    mqa_lookback: int = 128
+    mqa_window: int = 128
     mqa_n_queries: int = 8
     mqa_query_dim: int = 64
 
@@ -47,7 +47,6 @@ class RGLRU(eqx.Module):
         # state: (d_rnn,d_model)
         # NOTE: Not really sure if this is correct, paper is not very clear what the op. is and what the sizes are
         #       That being said, this should implement the desired behavior
-
         inp, rec = jnp.split(
             jax.nn.sigmoid(jax.vmap(self.lin1)(x)), (self.config.d_rnn,), axis=-1
         )
@@ -68,7 +67,6 @@ class RGLRU(eqx.Module):
         return y, state
 
 
-MQABlockSize = 128
 class LocalMQA(eqx.Module):
     qkv: nn.Linear
     config: GriffinConfig = eqx.field(static=True)
@@ -85,18 +83,28 @@ class LocalMQA(eqx.Module):
         self.config = config
 
     def __call__(self, x):
-        # NOTE: This computation is not optimised for long sequences, as memory usage still is O(n^2)
+        # NOTE: This is not efficient for long sequences, removing the real benefit of the Local MQA
+        # Unless JAX optimises this in the background
+        # For good optim one should probably utilise cuSparse, which isn't well supported in JAX afaik
         sq_len = x.shape[0]
         qkv = jax.vmap(self.qkv)(x)
-        k, v, q_s = jnp.split(qkv, (self.config.mqa_query_dim,self.config.mqa_query_dim*2), axis=-1)
-        q = jnp.reshape(q_s, (sq_len, self.config.mqa_n_queries, self.config.mqa_query_dim))
-        k = jnp.pad(k, ((self.config.mqa_lookback, 0), (0, 0)), constant_values=0)
-        v = jnp.pad(v, ((self.config.mqa_lookback, 0), (0, 0)), constant_values=0)
-
-        for i in range(0, sq_len, MQABlockSize):
-            #k[i-window:i+MQABlockSize] q[i:i+MQABlockSize] v[i-window:i+MQABlockSize]
-            attn = jax.nn.softmax(mask * jnp.einsum("id,jd->ij", q, k) / jnp.sqrt(d_k))
-
+        k, v, q_s = jnp.split(
+            qkv, (self.config.mqa_query_dim, self.config.mqa_query_dim * 2), axis=-1
+        )
+        q = jnp.reshape(
+            q_s, (sq_len, self.config.mqa_n_queries, self.config.mqa_query_dim)
+        )
+        mask = jnp.tril(jnp.ones((sq_len, sq_len))) - jnp.tril(
+            jnp.ones((sq_len, sq_len)), -self.config.mqa_window
+        )
+        attn = jax.nn.softmax(
+            jnp.sqrt(self.config.mqa_query_dim) * jnp.einsum("hid,jd->hij", q, k),
+            2,
+            where=mask,
+            initial=0,
+        )
+        out = jax.vmap(self.out)(jnp.einsum("hij,jd->hid", attn, v))
+        return out
 
 
 class MLPBlock(eqx.Module):
