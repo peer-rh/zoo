@@ -7,6 +7,8 @@ import jax.numpy as jnp
 import jax.random as jrng
 from equinox import nn
 
+# TODO: Add RoPE
+
 
 @dataclass
 class GriffinConfig:
@@ -86,6 +88,8 @@ class LocalMQA(eqx.Module):
         # NOTE: This is not efficient for long sequences, removing the real benefit of the Local MQA
         # Unless JAX optimises this in the background
         # For good optim one should probably utilise cuSparse, which isn't well supported in JAX afaik
+        # One easy way to make this more efficient is to use windowing, which creates redundancy in k,v
+        # , but allows for less computation and smaller attention matrix
         sq_len = x.shape[0]
         qkv = jax.vmap(self.qkv)(x)
         k, v, q_s = jnp.split(
