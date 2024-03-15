@@ -1,0 +1,3 @@
+- Similar to how [[griffin]] has done one could combine [[mamba]] with local attention
+- **NOTE:** However *Hawk* itself appears to already outperform mamba, but the inclusion of local attention might still improve the performance of a *mamba* based architecture
+- Additionally the recurrent unit from hawk and mamba are fairly similar, so there may not be any real benefit from a novelty aspect

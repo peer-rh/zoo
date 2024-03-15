@@ -15,6 +15,8 @@
 - [[RoPE]] (2024-03-05)
 - [[dense-mamba]] (2024-03-06)
 - [[galore]] (2024-03-09)
+- [[ml-and-information-theory-concepts-for-ai-mathematician]]
+- [[polynomial-time-extraction-of-neural-networks]] (2024-03-14)
 ## Future Inspiration
 - Graph Neural Networks
 - Vector Database algorithms
