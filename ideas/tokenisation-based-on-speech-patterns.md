@@ -1,0 +1,21 @@
+---
+aliases: 
+tags:
+  - ai/problem/tokenisation
+---
+- This explores the idea of using *speech patterns* to tokenise information
+- This would most likely only be useful when having a a character level latent-encoder before hand which is more complex than a simple linear layer 
+	- This is what would be the *Encoder* in [[jepa-for-text]]/[[griffin-jepa-for-text]]
+- Evidence suggesting that this is human
+	- By 18 Months a Baby has on average experienced $4380h$ of speech and is the main driver in language understanding
+	- Inner thinking (at least for me) feels greatly aligned with this *separation*, so it follows the same patterns
+		- However when thinking usually separation appears beforehand through actually having to think about what to do and after that is faster and more linear (at least of own perception)
+- As for how this could be achieved one could train a simple network to cluster the words based on timestamped dataset
+	- Theoretically one could examine speech patterns based on POS-Ngrams and create a fairly deterministic tokeniser
+- One clear **downside** of this method is that is only able to handle sentences in the languages it was trained on, so
+	- (i) No unstructured Data 
+	- (ii) No uncommon languages/ languages with poor data representation
+		- Especially timestamped transcriptions are very rare
+	- However these may be added by use of reinforcement learning
+		- For example after being trained on language data, however this has most likely be far from optimal
+- Another **downside** is that this is highly specialised on the domain of language and is a highly specialised method (not good according to [[the-bitter-lesson]]), however for the most part so are current tokenisation strategies

@@ -1,0 +1,52 @@
+---
+aliases: 
+tags:
+  - ai/method/llm
+---
+- This builds on [[jepa-for-text]], and is simply a slight twist of the idea
+- The main Idea is we use [[griffin]] for the encoder where the local attention is limited to the current *latent token* and the hidden states are propagated. 
+- The predictor can either be also griffin or a [[transformer|Transformer Networks]], since the memory problem isn't as big as the latent-tokens include a lot more characters compared to regular tokens
+- Training would could work as follows
+	- **Option 1:** Just like regular [[v-jepa]] we only train on latent space and train a decoder after
+	- **Option 2:** In addition to training on the latent space we train a decoder for the *predicted latent-tokens* which gets added to the loss
+		- This has the benefit that in comparison to video in language the details are a lot more important
+	- **Option 3:** We define the *encoder* to already include a *decoder*, so that we train the our encoder to (i) make $P$ predict the right things and (ii) correctly decode for every sentence
+		- This requires (i) careful consideration on the masking/transformation strategy 
+		- and (ii) we must make sure that (i) the trivial solution isn't a problem and the (ii) the predictor still remains
+### Tokenisation
+- One must note, that humans may very well do this, based on speech patterns, something the model will not have access to...
+	- Unless we first train a model to do that and separate the text into tokens
+	
+	- [[tokenisation-based-on-speech-patterns]]
+- As for tokenisation there are also different strategies which need evaluating
+	- **(i)** Reinforcement Learning 
+		- Adds great learning overhead however is the most flexible 
+		- Hard to define reward, which lets the model converge
+	- **(ii)** Predefined tokeniser (sentece, paragraph, ...) 
+		- May work for pure text but becomes increasingly difficult for unstructured data 
+	- **(iii)** Based on Gating parameters 
+		- Requires investigation of how gating functions in griffin 
+		- Many small changes will not be “detected”
+		- This could try to detect “State collapse” however model would have to learn that / the loss function should represent that
+		- Another option is to simply fire when the state has changed past a threshold of Euclidean distance to last change
+	- **(iv)** store all states (presumably would have to do that anyways for gradients) and then let a predictor just limit to k different ones or use attention
+		- Then one could train the model to predict this on the fly later on
+		- Its hard to define loss/reward for this, and would probably have to be based on reinforcement learning 
+	- **(v)** One could train a small net to partition the text in the beginning via reinforcement learning
+		- We first train the encoder model on one sentence examples 
+		- Once it is fairly decent we train the tokeniser and predictor
+		- Not a particularly clean option...
+	- **(vi)** Alternatively we can maybe just construct some CONV/Griffin net to create the tokens automatically with a constant compression factor
+		- Easy to train and converge
+		- High efficiency
+		- Disregards how compact data is...
+- More particularly what we want is to minimise the amount of latent-tokens generated, while maximising the amount of *useful* information stored
+	- Note that this is quite bad since it (i) requires dynamic array sizes, making this inefficient and (ii) is hard to train for, since selection isn't really differentiable
+### Transformations
+- As shown in [[world-models-in-visual-representation-learning]] one needs to apply drastic transformations to create equivariant world models (at least for images)
+- The problem arrises, that transformations on text are a lot harder/don't exist than with images
+- (i) Text is more information dense, which means that large-scale random masking will most likely remove important context
+- (ii) Skew, crop, hue, black-white simply don't have equivalents in text
+	- In theory one could change sentiment, however that is pretty expensive to do 
+- As for now the methods I have come up with
+	- Mask out random characters with a *NULL* token, which is similar to image masks in [[v-jepa]], however they are continuous in time and 

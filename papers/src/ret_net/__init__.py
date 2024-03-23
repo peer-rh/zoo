@@ -4,7 +4,7 @@ import flax.linen as nn
 import jax
 import jax.numpy as jnp
 
-from ..xpos import XPos
+from .xpos import XPos
 
 
 class RetNet(nn.Module):
