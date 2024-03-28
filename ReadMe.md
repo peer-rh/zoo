@@ -17,6 +17,7 @@
 - [[galore]] (2024-03-09)
 - [[ml-and-information-theory-concepts-for-ai-mathematician]] (2024-03-12)
 - [[polynomial-time-extraction-of-neural-networks]] (2024-03-14) (Not Completed)
+- [[deep-learning-compiler-survey]] (2024-03-24)
 ## Future Inspiration
 - Graph Neural Networks
 - Vector Database algorithms
