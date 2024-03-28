@@ -15,6 +15,14 @@ tags:
 	- To construct $\Delta$ for block-wise operations, we must 
 		- (i) multiply $k$ with $\alpha$ and $q$ with $\alpha^{-1}$ (similar to impl. of [[retnet-with-more-expressive-decay]])
 		- (ii) Construct the triangular matrix, $\Delta_{ij}=\prod_{k=i}^{j}\alpha_{k}$
+		- Used Cumulative Sum in Log space
 - Further improvements could include
 	- Local Attention as seen in [[griffin]]
 	- Skip Connections as in [[dense-mamba]] (they also showed very strong improvement in ret net) when using these skip connections
+
+- First implementation is finished now: It does learn the selective copying task
+	- We did use $\alpha^{r_{t}}$, since this converges, just sigmoid does not
+	- This is not optimal imo, and we should think of other solution, since this is limited by range $[\alpha,1]$ and not $[0,1]$
+	- We should look into including also a input gate, so not adding the input to the state, but to the output as in [[griffin]]
+	- Perhaps we can use a low-rank method for the alpha computation
+	- [ ] Find better initialisation values
