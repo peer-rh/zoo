@@ -8,8 +8,6 @@ from equinox import nn
 
 from .xpos import apply_xpos
 
-# TODO: Check correctness of xpos implementation, i.e. if it is correct value in comparison to actual impl.
-
 # Potential Performance Bottlenecks:
 # - Einsum and transpositions
 # - Application of XPos (How much is recomputed every time)
@@ -52,14 +50,6 @@ class GatedMultiScaleRetention(eqx.Module):
         self.alpha = nn.Linear(
             config.d_model, self.config.n_heads, use_bias=True, key=alpha_key
         )
-        # self.alpha = eqx.tree_at(
-        #     lambda x: x.weight,
-        #     self.alpha,
-        #     jnp.zeros((self.config.d_model, self.config.n_heads)),
-        # )
-        # self.alpha = eqx.tree_at(
-        #     lambda x: x.bias, self.alpha, jnp.zeros((self.config.n_heads,))
-        # )
         self.alpha_base = jnp.log(
             jax.random.uniform(
                 alpha_key, (self.config.n_heads,), minval=0.9, maxval=0.999
@@ -78,7 +68,6 @@ class GatedMultiScaleRetention(eqx.Module):
         alphas = self.alpha_base[:, None] * alphas
         k = (1 - jnp.exp(alphas))[:, :, None] * k
         alphas = jnp.cumsum(alphas, axis=1)
-        alphas = jnp.full_like(alphas, 0.95)
         Delta = jnp.tril(jnp.exp(alphas[:, :, None] - alphas[:, None, :]))
         attn = jnp.einsum("hid,hjd,hij->hij", q, k, Delta)
         ret = jnp.einsum("hij,hje->ihe", attn, v)
