@@ -26,3 +26,7 @@ tags:
 	- We should look into including also a input gate, so not adding the input to the state, but to the output as in [[griffin]]
 	- Perhaps we can use a low-rank method for the alpha computation
 	- [ ] Find better initialisation values
+- The major problem currently is learning long range dependencies
+	- I think that perhaps a new learning method would be helpful
+	- One option is that we can learn q, k, v on softmax (with sink) and want to learn alpha based on a exponentially weighted average of softmax value for k_t
+		- One question is wether we should use softmax or just linear attention -> What is the benefit of using softmax

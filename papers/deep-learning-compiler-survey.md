@@ -35,7 +35,7 @@ Citation: "M. Li _et al._, “The Deep Learning Compiler: A Comprehensive Survey
 		- They are less integratable with many tuning mechanisms
 	- There exist also many other methods, such as those employed by Glow and MLIR(LLVM-based)
 	- While **JIT** compilers have more information about the runtime environment, **AOT** (Ahead of Time) compilers have a larger scope in static analysis
-- The common DL compilers presented in the survey are **XLA**, **Glow**, **TVM**, **Tensor Compression (TC)**, and **nGraph**
+- The common DL compilers presented in the survey are **XLA**, **Glow**, **TVM**, **Tensor Comprehension (TC)**, and **nGraph**
 - The authors highlighted the following topics as common shortcomings of current DL-Compilers
 	- Good support for dynamic shapes
 	- Advanced autotuning (many local minima may not be the the global minima)

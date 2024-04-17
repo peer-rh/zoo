@@ -18,6 +18,5 @@
 - [[ml-and-information-theory-concepts-for-ai-mathematician]] (2024-03-12)
 - [[polynomial-time-extraction-of-neural-networks]] (2024-03-14) (Not Completed)
 - [[deep-learning-compiler-survey]] (2024-03-24)
-## Future Inspiration
-- Graph Neural Networks
-- Vector Database algorithms
+- [[mixture-of-depths]] (2024-04-06)
+- [[goedel-machine]] (2024-04-07)

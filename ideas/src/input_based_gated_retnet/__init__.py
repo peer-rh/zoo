@@ -52,7 +52,7 @@ class GatedMultiScaleRetention(eqx.Module):
         )
         self.alpha_base = jnp.log(
             jax.random.uniform(
-                alpha_key, (self.config.n_heads,), minval=0.9, maxval=0.999
+                alpha_key, (self.config.n_heads,), minval=0.95, maxval=0.999
             )
         )
         self.g_norm = nn.GroupNorm(self.config.n_heads, self.config.d_model)
@@ -65,7 +65,7 @@ class GatedMultiScaleRetention(eqx.Module):
 
     def retention(self, q, k, v, alphas, state):
         sqlen = alphas.shape[1]
-        alphas = self.alpha_base[:, None] * alphas
+        alphas = self.alpha_base[:, None] * 8 * alphas
         k = (1 - jnp.exp(alphas))[:, :, None] * k
         alphas = jnp.cumsum(alphas, axis=1)
         Delta = jnp.tril(jnp.exp(alphas[:, :, None] - alphas[:, None, :]))
